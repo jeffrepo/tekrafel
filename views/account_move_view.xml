@@ -14,6 +14,7 @@
                     <field name="codigo_qr" invisible="True"/>
                     <field name="representacion_grafica_fel"/>
                     <field name="codigo_qr"/>
+                    <field name="incoterm_fel"/>
                 </group>
             </field>
         </record>

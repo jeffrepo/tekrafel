@@ -33,21 +33,21 @@ class AccountMove(models.Model):
     # feel_numero = fields.Char('Feel numero')
     # feel_uuid = fields.Char('UUID')
     # feel_documento_certificado = fields.Char('Documento Feel')
-    # feel_incoterm = fields.Selection([
-    #         ('EXW', 'En fábrica'),
-    #         ('FCA', 'Libre transportista'),
-    #         ('FAS', 'Libre al costado del buque'),
-    #         ('FOB', 'Libre a bordo'),
-    #         ('CFR', 'Costo y flete'),
-    #         ('CIF','Costo, seguro y flete'),
-    #         ('CPT','Flete pagado hasta'),
-    #         ('CIP','Flete y seguro pagado hasta'),
-    #         ('DDP','Entregado en destino con derechos pagados'),
-    #         ('DAP','Entregada en lugar'),
-    #         ('DAT','Entregada en terminal'),
-    #         ('ZZZ','Otros')
-    #     ],string="Incoterm",default="EXW",
-    #     help="Termino de entrega")
+    incoterm_fel = fields.Selection([
+            ('EXW', 'En fábrica'),
+            ('FCA', 'Libre transportista'),
+            ('FAS', 'Libre al costado del buque'),
+            ('FOB', 'Libre a bordo'),
+            ('CFR', 'Costo y flete'),
+            ('CIF','Costo, seguro y flete'),
+            ('CPT','Flete pagado hasta'),
+            ('CIP','Flete y seguro pagado hasta'),
+            ('DDP','Entregado en destino con derechos pagados'),
+            ('DAP','Entregada en lugar'),
+            ('DAT','Entregada en terminal'),
+            ('ZZZ','Otros')
+        ],string="Incoterm",default="EXW",
+        help="Termino de entrega")
     # acuse_recibo_sat = fields.Char('Acuse Recibo SAT')
     # codigo_sat = fields.Char('Codigo SAT')
     # formato_xml = fields.Binary('XML Anulado')
@@ -443,7 +443,7 @@ class AccountMove(models.Model):
             TagOtraReferencia = etree.SubElement(TagExportacion,cex+"OtraReferencia",{})
             TagOtraReferencia.text = "N/A"
             TagINCOTERM = etree.SubElement(TagExportacion,cex+"INCOTERM",{})
-            TagINCOTERM.text = str(factura.feel_incoterm)
+            TagINCOTERM.text = str(factura.incoterm_fel)
             TagNombreExportador = etree.SubElement(TagExportacion,cex+"NombreExportador",{})
             TagNombreExportador.text = str(factura.company_id.name)
             TagCodigoExportador = etree.SubElement(TagExportacion,cex+"CodigoExportador",{})

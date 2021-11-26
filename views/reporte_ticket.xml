@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="reporte_ticket">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article">
+                    <div class="page" style="position: relative; font-size: 150%; zoom: 70%;">
+
+                        <div align="center">
+                            <img t-if="o.company_id.logo" t-att-src="'data:image/png;base64,%s' % to_text(o.company_id.logo)" style="width:100%"/>
+                        </div>
+
+                        <strong><center>Serie: <span t-field="o.feel_serie"/> No. <span t-field="o.feel_numero"/></center></strong>
+                        <p><strong><center>--------- INFORMACIÓN EMISOR ------------</center></strong></p>
+                        <p><strong><center>DOCUMENTO TRIBUTARIO ELECTRONICO</center></strong></p>
+                        <p><strong><center>FACTURA ELECTRONICA</center></strong></p>
+                        <p><strong>
+                              <center>
+                                    NIT: <span t-esc="o.company_id.vat"/><br/>
+                                    <span t-esc="o.journal_id.feel_nombre_comercial"/>
+                              </center>
+                          </strong>
+                        </p>
+
+
+                        <p>
+                            <center>
+                                <span t-esc="o.company_id.name"/> <br/>
+                                <span t-esc="o.company_id.street"/> <span t-esc="o.company_id.street2"/> <br/>
+                                No. Autorización <br/>
+                                <span t-esc="o.feel_numero_autorizacion"/>
+                            </center>
+                        </p>
+
+
+                        <p><strong><center>--------- INFORMACIÓN COMPRADOR ------------</center></strong></p>
+
+                        <p>
+                            <center>
+                                <span t-esc="o.invoice_date" t-options="{'widget': 'date'}"/> <br/>
+                                <span t-esc="o.partner_id.name"/> <br/>
+                                Dirección: <span t-esc="o.partner_id.company_id.street"/> <span t-esc="o.partner_id.company_id.street2"/> <br/>
+                            </center>
+                        </p>
+                        <p><strong><center>------------------------------------------------</center></strong></p>
+
+                        <p>
+                            <table style="margin: 0 auto;width:100%;">
+                                <tr>
+                                    <th>CANT</th>
+                                    <th>DESCRIPCIÓN</th>
+                                    <th>PRECIO</th>
+                                    <th>TOTAL</th>
+                                </tr>
+                                <t t-foreach="o.invoice_line_ids" t-as="linea">
+                                    <tr>
+                                        <td style="border-top: 1px solid black;"><span t-field="linea.quantity"/></td>
+                                        <td style="border-top: 1px solid black;"><span t-field="linea.name"/></td>
+                                        <td style="border-top: 1px solid black;"><span t-field="linea.price_unit"/></td>
+                                        <td style="border-top: 1px solid black;"><span t-field="linea.price_total"/></td>
+                                    </tr>
+                                </t>
+                                <tr>
+                                    <td style="border-top: 1px solid black;"></td>
+                                    <td style="border-top: 1px solid black;"></td>
+                                    <td style="border-top: 1px solid black;"><strong>Total</strong></td>
+                                    <td style="border-top: 1px solid black;"><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                                </tr>
+                            </table>
+                        </p>
+                        <p><strong><center>------------------------------------------------</center></strong></p>
+                        <p><strong><center>SUJETO A PAGOS TRIMESTRALES</center></strong></p>
+                        <div class="barcode">
+                            <center><img alt="Barcode" t-att-src="'/report/barcode/?type=QR&amp;value=%s&amp;width=180&amp;height=180'
+                              % quote_plus('https://felgtaws.digifact.com.gt/guest/api/FEL?' + keep_query(DATA=o.company_id.vat)+'%7C'+o.feel_numero_autorizacion +'%7CGUESTUSERQR')
+                              "/></center>
+                        </div>
+                        <t t-set="fecha_hora" t-value="fecha_hora_factura(o.invoice_date)"/>
+                        <p><strong><center>
+                          DATOS DEL GFACE <br/>
+                          CERTIFICADOR NIT 7745482-0 DIGIFACT SERVICIOS,<br/>
+                          SOCIEDAD ANONIMA https://felgtaws.digifact.com.gt <br/>
+                          Fecha Hora Certificacion <span t-esc="fecha_hora"/>
+                        </center></strong></p>
+
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

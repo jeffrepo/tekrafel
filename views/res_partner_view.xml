@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="digifactfel_view_res_partner_form">
+            <field name="name">digifactfel.view.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="website" position="after">
+                    <field name="codigo_comprador"></field>
+                </field>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

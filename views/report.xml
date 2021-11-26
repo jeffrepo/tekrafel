@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <report
+            id="digifactfel_ticket"
+            string="Ticket Digifact"
+            model="account.move"
+            report_type="qweb-pdf"
+            file="digifactfel.reporte_ticket"
+            name="digifactfel.reporte_ticket"
+            paperformat="paperformat_ticket"
+        />
+
+    </data>
+</odoo>

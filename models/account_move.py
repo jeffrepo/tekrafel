@@ -165,9 +165,9 @@ class AccountMove(models.Model):
         TagCodigoPostal = etree.SubElement(TagDireccionEmisor,DTE_NS+"CodigoPostal",{})
         TagCodigoPostal.text = str(factura.company_id.zip)
         modulo_bio = self.env['ir.module.module'].search([('name', '=', 'biotecnica')])
-        municipio = str(factura.partner_id.company_id.city) if factura.partner_id.company_id.city else "GUATEMALA"
+        municipio = str(factura.company_id.city)
         if not modulo_bio or modulo_bio.state == 'installed':
-            municipio = factura.partner_id.municipio_id.name.upper()
+            municipio = factura.partner_id.municipio_id.name
 
         TagMunicipio = etree.SubElement(TagDireccionEmisor,DTE_NS+"Municipio",{})
         TagMunicipio.text = municipio
@@ -410,9 +410,12 @@ class AccountMove(models.Model):
 
                 Envelope = etree.Element("Envelope", {'xmlns': 'http://schemas.xmlsoap.org/soap/envelope/'})
                 BodyTag = etree.SubElement(Envelope,'Body')
-                CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'https://apicertificacion.tekra.com.gt/certificacion/wsdl/'})
+
                 if factura.company_id.prueba_fel:
                     CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/'})
+                else:
+                    CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'https://apicertificacion.tekra.com.gt/certificacion/wsdl/'})
+
                 AutenticacionTag = etree.SubElement(CertificacionDocumentoTag, 'Autenticacion')
                 PnUsuarioTag = etree.SubElement(AutenticacionTag, 'pn_usuario')
                 PnUsuarioTag.text =pn_usuario
@@ -479,7 +482,16 @@ class AccountMove(models.Model):
                                             factura.fecha_fel = xmls_factura['fecha_hora_emision']
                                     else:
                                         raise UserError(str( resultado_certificacion_string ))
-
+                                else:
+                                    raise UserError(str( json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"] ))
+                            else:
+                                raise UserError(str(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"] ))
+                        else:
+                            raise UserError(str(json_loads["Envelope"]["Body"]  ))
+                    else:
+                        raise UserError(str(json_loads["Envelope"]))
+                else:
+                    raise UserError(str(json_loads))
         return super(AccountMove, self)._post(soft)
 
     def xml_factura_anulacion(self, factura):
@@ -592,11 +604,18 @@ class AccountMove(models.Model):
 
                 # prints the response
                 doc1 = response2.text
+
                 namespaces = {
                     'http://schemas.xmlsoap.org/soap/envelope/': None,
                     'http://schemas.xmlsoap.org/soap/envelope/': None,
-                    'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/': None
+                    'https://apicertificacion.tekra.com.gt/certificacion/wsdl/': None
                 }
+                if factura.company_id.prueba_fel:
+                    namespaces = {
+                        'http://schemas.xmlsoap.org/soap/envelope/': None,
+                        'http://schemas.xmlsoap.org/soap/envelope/': None,
+                        'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/': None
+                    }
                 json_text = xmltodict.parse(response2.text,process_namespaces=True,namespaces=namespaces)
                 json_dic = json.dumps(json_text)
                 json_loads = json.loads(json_dic)

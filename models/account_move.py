@@ -165,9 +165,9 @@ class AccountMove(models.Model):
         TagCodigoPostal = etree.SubElement(TagDireccionEmisor,DTE_NS+"CodigoPostal",{})
         TagCodigoPostal.text = str(factura.company_id.zip)
         modulo_bio = self.env['ir.module.module'].search([('name', '=', 'biotecnica')])
-        municipio = str(factura.company_id.city)
+        municipio = str(factura.partner_id.company_id.city) if factura.partner_id.company_id.city else "GUATEMALA"
         if not modulo_bio or modulo_bio.state == 'installed':
-            municipio = factura.partner_id.municipio_id.name
+            municipio = factura.partner_id.municipio_id.name.upper()
 
         TagMunicipio = etree.SubElement(TagDireccionEmisor,DTE_NS+"Municipio",{})
         TagMunicipio.text = municipio
@@ -410,7 +410,9 @@ class AccountMove(models.Model):
 
                 Envelope = etree.Element("Envelope", {'xmlns': 'http://schemas.xmlsoap.org/soap/envelope/'})
                 BodyTag = etree.SubElement(Envelope,'Body')
-                CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/'})
+                CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'https://apicertificacion.tekra.com.gt/certificacion/wsdl/'})
+                if factura.prueba_fel:
+                    CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/'})
                 AutenticacionTag = etree.SubElement(CertificacionDocumentoTag, 'Autenticacion')
                 PnUsuarioTag = etree.SubElement(AutenticacionTag, 'pn_usuario')
                 PnUsuarioTag.text =pn_usuario

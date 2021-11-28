@@ -436,7 +436,9 @@ class AccountMove(models.Model):
                 # json_test = {"raw": }}
 
                 #AUTENTICACION TEKRA
-                url = "http://apicertificacion.desa.tekra.com.gt:8080/certificacion/servicio.php"
+                url = "https://apicertificacion.tekra.com.gt/servicio.php"
+                if factura.company_id.prueba_fel:
+                    url = "http://apicertificacion.desa.tekra.com.gt:8080/certificacion/servicio.php"
 
                 # headers
                 headers = { 'Content-Type': 'application/xml','Connection': 'keep-alive' }
@@ -577,7 +579,9 @@ class AccountMove(models.Model):
                 # json_test = {"raw": }}
 
                 #AUTENTICACION TEKRA
-                url = "http://apicertificacion.desa.tekra.com.gt:8080/certificacion/servicio.php"
+                url = "https://apicertificacion.tekra.com.gt/servicio.php"
+                if factura.company_id.prueba_fel:
+                    url = "http://apicertificacion.desa.tekra.com.gt:8080/certificacion/servicio.php"
 
                 # headers
                 headers = { 'Content-Type': 'application/xml','Connection': 'keep-alive' }

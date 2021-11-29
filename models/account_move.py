@@ -631,7 +631,14 @@ class AccountMove(models.Model):
                                         if ("RepresentacionGrafica"  and "NumeroAutorizacion" and "NumeroDocumento" and "SerieDocumento") in resultado_cdr:
                                             representacion_grafica_anulada_fel = resultado_cdr["RepresentacionGrafica"]
                                             factura.representacion_grafica_anulada_fel = representacion_grafica_anulada_fel
+                                        else:
+                                            raise UserError( str(resultado_certificacion_string))
                                     else:
                                         raise UserError( resultado_certificacion_string["error"] )
-
+                                else:
+                                    raise UserError(json_loads)
+                            else:
+                                raise UserError(json_loads)
+                        else:
+                            raise UserError(json_loads)
         return super(AccountMove, self).button_draft()

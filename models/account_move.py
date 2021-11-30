@@ -387,7 +387,7 @@ class AccountMove(models.Model):
 
         xmls = etree.tostring(GTDocumento, encoding="UTF-8")
         # logging.warning(xmls)
-        xmls = xmls.decode("utf-8").replace("&amp;", "&").encode("utf-8")
+        xmls = xmls.decode("utf-8").replace("&", "&amp;").encode("utf-8")
         # logging.warning(xmls)
         xmls_base64 = base64.b64encode(xmls)
 
@@ -448,6 +448,7 @@ class AccountMove(models.Model):
                 # headers
                 headers = { 'Content-Type': 'application/xml','Connection': 'keep-alive' }
                 # POST request
+                # logging.warning(xmls2)
                 response2 = requests.post(url, data=xmls2,headers=headers , verify=False)
 
                 # prints the response

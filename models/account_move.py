@@ -392,7 +392,7 @@ class AccountMove(models.Model):
         xmls_base64 = base64.b64encode(xmls)
 
 
-        return {'xmls': xmls, 'fecha_hora_emision': fecha_hora_emision}
+        return {'xmls': xmls.decode("utf-8"), 'fecha_hora_emision': fecha_hora_emision}
 
     def _post(self,soft=True):
         for factura in self:

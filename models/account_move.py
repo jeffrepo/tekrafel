@@ -334,7 +334,7 @@ class AccountMove(models.Model):
             TagNumeroAbono = etree.SubElement(TagAbono,"NumeroAbono",{})
             TagNumeroAbono.text = "1"
             TagFechaVencimiento = etree.SubElement(TagAbono,"FechaVencimiento",{})
-            fecha_vencimiento = datetime.datetime.strptime(str(factura.invoice_date), '%Y-%m-%d').date().strftime('%Y-%m-%d')
+            fecha_vencimiento = datetime.datetime.strptime(str(factura.invoice_date_due), '%Y-%m-%d').date().strftime('%Y-%m-%d')
             TagFechaVencimiento.text = fecha_vencimiento
             TagMontoAbono = etree.SubElement(TagAbono,"MontoAbono",{})
             TagMontoAbono.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))

@@ -328,13 +328,17 @@ class AccountMove(models.Model):
         if tipo == 'FCAM':
             DTE_CFC = "{http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0}"
             TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
-            TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",{'DComplemento': "", 'NombreComplemento': "AbonosFacturaCambiaria",'URIComplemento': ""})
+            TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",{'NombreComplemento': "AbonosFacturaCambiaria",'URIComplemento': ""})
             TagAbonosFacturaCambiaria = etree.SubElement(TagComplemento,DTE_CFC+"AbonosFacturaCambiaria", {"Version": "1"})
             TagAbono = etree.SubElement(TagAbonosFacturaCambiaria,"Abono",{})
             TagNumeroAbono = etree.SubElement(TagAbono,"NumeroAbono",{})
             TagNumeroAbono.text = "1"
             TagFechaVencimiento = etree.SubElement(TagAbono,"FechaVencimiento",{})
             fecha_vencimiento = datetime.datetime.strptime(str(factura.invoice_date_due), '%Y-%m-%d').date().strftime('%Y-%m-%d')
+            if factura.invoice_payment_term_id:
+                dias = factura.invoice_payment_term_id.line_ids[0].days
+                fecha_vencimiento = factura.invoice_date + datetime.timedelta(days=dias)
+                fecha_vencimiento = datetime.datetime.strptime(str(fecha_vencimiento), '%Y-%m-%d').date().strftime('%Y-%m-%d')
             TagFechaVencimiento.text = fecha_vencimiento
             TagMontoAbono = etree.SubElement(TagAbono,"MontoAbono",{})
             TagMontoAbono.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))

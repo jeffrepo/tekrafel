@@ -208,7 +208,7 @@ class AccountMove(models.Model):
                         frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
                     else:
                         frases_datos = {"CodigoEscenario": linea_frase.codigo}
-                if tipo == 'FACT' and factura.currency_id ==  self.env.user.company_id.currency_id:
+                if tipo in ['FACT','FCAM'] and factura.currency_id ==  self.env.user.company_id.currency_id:
                     if int(linea_frase.frase) == 4:
                         continue
                     else:
@@ -325,6 +325,21 @@ class AccountMove(models.Model):
         # TagGranTotal.text = str(factura.amount_total)
         TagGranTotal.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
 
+        if tipo == 'FCAM':
+            DTE_CFC = "{http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0}"
+            TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+            TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",{'DComplemento': "", 'NombreComplemento': "AbonosFacturaCambiaria",'URIComplemento': ""})
+            TagAbonosFacturaCambiaria = etree.SubElement(TagComplemento,DTE_CFC+"AbonosFacturaCambiaria", {"Version": "1"})
+            TagAbono = etree.SubElement(TagAbonosFacturaCambiaria,"Abono",{})
+            TagNumeroAbono = etree.SubElement(TagAbono,"NumeroAbono",{})
+            TagNumeroAbono.text = "1"
+            TagFechaVencimiento = etree.SubElement(TagAbono,"FechaVencimiento",{})
+            fecha_vencimiento = datetime.datetime.strptime(str(factura.invoice_date), '%Y-%m-%d').date().strftime('%Y-%m-%d')
+            TagFechaVencimiento.text = fecha_vencimiento
+            TagMontoAbono = etree.SubElement(TagAbono,"MontoAbono",{})
+            TagMontoAbono.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
+
+
         if tipo == 'FACT' and (factura.currency_id !=  self.env.user.company_id.currency_id and factura.tipo_factura == 'exportacion'):
             dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': str(0.00)}
             TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
@@ -384,6 +399,10 @@ class AccountMove(models.Model):
                 }
                 TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
 
+        if factura.narration:
+            TagAdenda = etree.SubElement(TagDTE, DTE_NS+"Adenda",{})
+            TagDECER = etree.SubElement(TagAdenda,"DECertificador",{})
+            TagDECER.text = str(factura.narration)
 
         xmls = etree.tostring(GTDocumento, encoding="UTF-8")
         # logging.warning(xmls)
@@ -448,7 +467,7 @@ class AccountMove(models.Model):
                 # headers
                 headers = { 'Content-Type': 'application/xml','Connection': 'keep-alive' }
                 # POST request
-                # logging.warning(xmls2)
+                logging.warning(xmls2)
                 response2 = requests.post(url, data=xmls2,headers=headers , verify=False)
 
                 # prints the response

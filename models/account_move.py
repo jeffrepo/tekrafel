@@ -82,6 +82,7 @@ class AccountMove(models.Model):
         NSMAP = {
             "ds": "http://www.w3.org/2000/09/xmldsig#",
             "dte": "http://www.sat.gob.gt/dte/fel/0.2.0",
+            "cfc": "http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0",
             "xsi": "http://www.w3.org/2001/XMLSchema-instance"
         }
         moneda = str(factura.currency_id.name)
@@ -326,21 +327,27 @@ class AccountMove(models.Model):
         TagGranTotal.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
 
         if tipo == 'FCAM':
+            NSMAPFRASECFC = {
+                "cfc": "http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0"
+            }
+            DTE_NS_CFC = "{http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0}"
             DTE_CFC = "{http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0}"
             TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
             TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",{'NombreComplemento': "AbonosFacturaCambiaria",'URIComplemento': ""})
-            TagAbonosFacturaCambiaria = etree.SubElement(TagComplemento,DTE_CFC+"AbonosFacturaCambiaria", {"Version": "1"})
-            TagAbono = etree.SubElement(TagAbonosFacturaCambiaria,"Abono",{})
-            TagNumeroAbono = etree.SubElement(TagAbono,"NumeroAbono",{})
+            TagAbonosFacturaCambiaria = etree.SubElement(TagComplemento,DTE_NS_CFC+"AbonosFacturaCambiaria", {"Version": "1"},nsmap=NSMAPFRASECFC )
+            TagAbono = etree.SubElement(TagAbonosFacturaCambiaria,DTE_NS_CFC+"Abono",{})
+            TagNumeroAbono = etree.SubElement(TagAbono,DTE_NS_CFC+"NumeroAbono",{})
             TagNumeroAbono.text = "1"
-            TagFechaVencimiento = etree.SubElement(TagAbono,"FechaVencimiento",{})
-            fecha_vencimiento = datetime.datetime.strptime(str(factura.invoice_date_due), '%Y-%m-%d').date().strftime('%Y-%m-%d')
+            TagFechaVencimiento = etree.SubElement(TagAbono,DTE_NS_CFC+"FechaVencimiento",{})
+            fecha_vencimiento = ""
+            if factura.invoice_date_due:
+                fecha_vencimiento = datetime.datetime.strptime(str(factura.invoice_date_due), '%Y-%m-%d').date().strftime('%Y-%m-%d')
             if factura.invoice_payment_term_id:
                 dias = factura.invoice_payment_term_id.line_ids[0].days
                 fecha_vencimiento = factura.invoice_date + datetime.timedelta(days=dias)
                 fecha_vencimiento = datetime.datetime.strptime(str(fecha_vencimiento), '%Y-%m-%d').date().strftime('%Y-%m-%d')
             TagFechaVencimiento.text = fecha_vencimiento
-            TagMontoAbono = etree.SubElement(TagAbono,"MontoAbono",{})
+            TagMontoAbono = etree.SubElement(TagAbono,DTE_NS_CFC+"MontoAbono",{})
             TagMontoAbono.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
 
 

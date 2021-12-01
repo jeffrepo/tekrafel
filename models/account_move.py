@@ -491,6 +491,8 @@ class AccountMove(models.Model):
                 json_text = xmltodict.parse(response2.text,process_namespaces=True,namespaces=namespaces)
                 json_dic = json.dumps(json_text)
                 json_loads = json.loads(json_dic)
+                logging.warning('json_loads')
+                logging.warning(json_loads)
                 if "Envelope" in json_loads:
                     if "Body" in json_loads["Envelope"]:
                         if "CertificacionDocumentoResponse" in json_loads["Envelope"]["Body"]:

@@ -495,7 +495,11 @@ class AccountMove(models.Model):
                 logging.warning(json_loads)
                 if "Envelope" in json_loads:
                     if "Body" in json_loads["Envelope"]:
+                        logging.warning('json_loads["Envelope"]["Body"]')
+                        logging.warning(json_loads["Envelope"]["Body"])
                         if "CertificacionDocumentoResponse" in json_loads["Envelope"]["Body"]:
+                            logging.warning('json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]')
+                            logging.warning(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"])
                             if "ResultadoCertificacion" in json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]:
                                 if "error" in json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"]:
                                     resultado_cdr = json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]
@@ -514,14 +518,19 @@ class AccountMove(models.Model):
                                             factura.codigo_qr = codigo_qr
                                             factura.fecha_fel = xmls_factura['fecha_hora_emision']
                                     else:
+                                        logging.warning('1')
                                         raise UserError(str( resultado_certificacion_string ))
                                 else:
+                                    logging.warning('2')
                                     raise UserError(str( json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"] ))
                             else:
+                                logging.warning('3')
                                 raise UserError(str(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"] ))
                         else:
+                            logging.warning('4')
                             raise UserError(str(json_loads["Envelope"]["Body"]  ))
                     else:
+                        logging.warning('5')
                         raise UserError(str(json_loads["Envelope"]))
                 else:
                     raise UserError(str(json_loads))

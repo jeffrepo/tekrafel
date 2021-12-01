@@ -609,7 +609,11 @@ class AccountMove(models.Model):
 
                 Envelope = etree.Element("Envelope", {'xmlns': 'http://schemas.xmlsoap.org/soap/envelope/'})
                 BodyTag = etree.SubElement(Envelope,'Body')
-                CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/'})
+                if factura.company_id.prueba_fel:
+                    CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/'})
+                else:
+                    CertificacionDocumentoTag = etree.SubElement(BodyTag,'CertificacionDocumento',{'xmlns': 'https://apicertificacion.tekra.com.gt/certificacion/wsdl/'})
+
                 AutenticacionTag = etree.SubElement(CertificacionDocumentoTag, 'Autenticacion')
                 PnUsuarioTag = etree.SubElement(AutenticacionTag, 'pn_usuario')
                 PnUsuarioTag.text =pn_usuario

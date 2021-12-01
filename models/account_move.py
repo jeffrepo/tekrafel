@@ -229,7 +229,7 @@ class AccountMove(models.Model):
 
         for linea in factura.invoice_line_ids:
             tax_ids = linea.tax_ids
-            numero_linea = 1
+            numero_linea = linea.id
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
             linea_datos = {
                 "BienOServicio": bien_servicio,

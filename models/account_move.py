@@ -183,8 +183,11 @@ class AccountMove(models.Model):
         TagReceptorDireccion.text = (factura.partner_id.street or "Ciudad")+" "+(factura.partner_id.street2 or "")
         TagReceptorCodigoPostal = etree.SubElement(TagDireccionReceptor,DTE_NS+"CodigoPostal",{})
         TagReceptorCodigoPostal.text = factura.partner_id.zip or '01001'
+        municipio_partner = str(factura.partner_id.city)
+        if not modulo_bio or modulo_bio.state == 'installed':
+            municipio_partner = factura.partner_id.municipio_id.name
         TagReceptorMunicipio = etree.SubElement(TagDireccionReceptor,DTE_NS+"Municipio",{})
-        TagReceptorMunicipio.text = factura.partner_id.city or 'Guatemala'
+        TagReceptorMunicipio.text = municipio_partner or 'Guatemala'
         TagReceptorDepartamento = etree.SubElement(TagDireccionReceptor,DTE_NS+"Departamento",{})
         TagReceptorDepartamento.text = factura.partner_id.state_id.name or 'Guatemala'
         TagReceptorPais = etree.SubElement(TagDireccionReceptor,DTE_NS+"Pais",{})
@@ -255,7 +258,7 @@ class AccountMove(models.Model):
             TagUnidadMedida = etree.SubElement(TagItem,DTE_NS+"UnidadMedida",{})
             TagUnidadMedida.text = str(unidad_medida)
             TagDescripcion = etree.SubElement(TagItem,DTE_NS+"Descripcion",{})
-            TagDescripcion.text = (str(linea.product_id.default_code) +'|'+descripcion) if linea.product_id.default_code else descripcion
+            TagDescripcion.text = (str(linea.product_id.default_code) +'|'+ str(descripcion)) if linea.product_id.default_code else descripcion
             TagPrecioUnitario = etree.SubElement(TagItem,DTE_NS+"PrecioUnitario",{})
             TagPrecioUnitario.text = '{:.6f}'.format(precio_unitario)
             TagPrecio = etree.SubElement(TagItem,DTE_NS+"Precio",{})

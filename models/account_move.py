@@ -191,7 +191,7 @@ class AccountMove(models.Model):
         TagReceptorDepartamento = etree.SubElement(TagDireccionReceptor,DTE_NS+"Departamento",{})
         TagReceptorDepartamento.text = factura.partner_id.state_id.name or 'Guatemala'
         TagReceptorPais = etree.SubElement(TagDireccionReceptor,DTE_NS+"Pais",{})
-        TagReceptorPais.text = factura.partner_id.country_id.code or "GT"
+        TagReceptorPais.text = factura.partner_id.country_id.name
         # Frases
 
         data_frase = {

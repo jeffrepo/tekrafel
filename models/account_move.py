@@ -164,7 +164,7 @@ class AccountMove(models.Model):
         TagDireccion = etree.SubElement(TagDireccionEmisor,DTE_NS+"Direccion",{})
         TagDireccion.text = str(factura.journal_id.direccion_sucursal)
         TagCodigoPostal = etree.SubElement(TagDireccionEmisor,DTE_NS+"CodigoPostal",{})
-        TagCodigoPostal.text = str(factura.company_id.zip)
+        TagCodigoPostal.text = str(factura.journal_id.codigo_postal)
         modulo_bio = self.env['ir.module.module'].search([('name', '=', 'biotecnica')])
         municipio = str(factura.company_id.city)
         if not modulo_bio or modulo_bio.state == 'installed':

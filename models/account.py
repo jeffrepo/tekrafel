@@ -43,3 +43,4 @@ class AccountJournal(models.Model):
     descripcion_factura = fields.Boolean('Descripcion factura')
     direccion_sucursal = fields.Char('Dirección')
     telefono = fields.Char('Teléfono')
+    codigo_postal = fields.Char('Codigo postal')

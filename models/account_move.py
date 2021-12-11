@@ -184,8 +184,8 @@ class AccountMove(models.Model):
         TagReceptorCodigoPostal = etree.SubElement(TagDireccionReceptor,DTE_NS+"CodigoPostal",{})
         TagReceptorCodigoPostal.text = factura.partner_id.zip or '01001'
         municipio_partner = str(factura.partner_id.city)
-        if modulo_bio or modulo_bio.state == 'installed':
-            municipio_partner = factura.partner_id.municipio_id.name
+        # if modulo_bio or modulo_bio.state == 'installed':
+        #     municipio_partner = factura.partner_id.municipio_id.name
         TagReceptorMunicipio = etree.SubElement(TagDireccionReceptor,DTE_NS+"Municipio",{})
         TagReceptorMunicipio.text = municipio_partner or 'Guatemala'
         TagReceptorDepartamento = etree.SubElement(TagDireccionReceptor,DTE_NS+"Departamento",{})

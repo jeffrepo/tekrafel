@@ -21,7 +21,7 @@ from lxml.etree import CDATA
 import xmltodict, json
 
 class AccountMove(models.Model):
-    _inherit = "account.move"
+    _inherit = "account.invoice"
 
     numero_autorizacion_fel = fields.Char('Numero de autorización',copy=False)
     numero_documento_fel = fields.Char('Numero de documento',copy=False)
@@ -73,8 +73,9 @@ class AccountMove(models.Model):
         xmls = ''
 
         lista_impuestos = []
-        if factura.invoice_date != True:
-            factura.invoice_date = fields.Date.context_today(self)
+        # invoice_date => date_invoice
+        if factura.date_invoice != True:
+            factura.date_invoice = fields.Date.context_today(self)
 
         attr_qname = etree.QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation")
         DTE_NS = "{http://www.sat.gob.gt/dte/fel/0.2.0}"
@@ -86,13 +87,17 @@ class AccountMove(models.Model):
             "xsi": "http://www.w3.org/2001/XMLSchema-instance"
         }
         moneda = str(factura.currency_id.name)
-        fecha = datetime.datetime.strptime(str(factura.invoice_date), '%Y-%m-%d').date().strftime('%Y-%m-%d')
+        # invoice_date => date_invoice
+        fecha = datetime.datetime.strptime(str(factura.date_invoice), '%Y-%m-%d').date().strftime('%Y-%m-%d')
         hora = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
-        fecha_hora_emision = self.fecha_hora_factura(factura.invoice_date)
+        # invoice_date => date_invoice
+        fecha_hora_emision = self.fecha_hora_factura(factura.date_invoice)
         tipo = factura.journal_id.tipo_dte_fel
 
-        if tipo == 'NCRE' and factura.move_type == "out_refund":
-            factura_original_id = self.env['account.move'].search([('numero_autorizacion_fel','=',factura.numero_autorizacion_fel),('id','!=',factura.id)])
+        # move_type => type
+        if tipo == 'NCRE' and factura.type == "out_refund":
+            # account.move => account.invoice
+            factura_original_id = self.env['account.invoice'].search([('numero_autorizacion_fel','=',factura.numero_autorizacion_fel),('id','!=',factura.id)])
             if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                 tipo == 'NCRE'
             else:
@@ -231,7 +236,8 @@ class AccountMove(models.Model):
         tax_iva = False
 
         for linea in factura.invoice_line_ids:
-            tax_ids = linea.tax_ids
+            # tax_ids => invoice_line_tax_ids
+            tax_ids = linea.invoice_line_tax_ids
             numero_linea = linea.id
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
             linea_datos = {
@@ -266,10 +272,11 @@ class AccountMove(models.Model):
             TagDescuento = etree.SubElement(TagItem,DTE_NS+"Descuento",{})
             TagDescuento.text =  str('{:.6f}'.format(descuento))
 
-            currency = linea.move_id.currency_id
-            taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
+            currency = linea.invoice_id.currency_id
+            taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.invoice_id.partner_id)
 
-            if len(linea.tax_ids) > 0:
+            # tax_ids =>invoice_line_tax_ids
+            if len(linea.invoice_line_tax_ids) > 0:
                 # impuestos
                 TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
                 for impuesto in taxes['taxes']:
@@ -343,11 +350,12 @@ class AccountMove(models.Model):
             TagNumeroAbono.text = "1"
             TagFechaVencimiento = etree.SubElement(TagAbono,DTE_NS_CFC+"FechaVencimiento",{})
             fecha_vencimiento = ""
-            if factura.invoice_date_due:
-                fecha_vencimiento = datetime.datetime.strptime(str(factura.invoice_date_due), '%Y-%m-%d').date().strftime('%Y-%m-%d')
-            if factura.invoice_payment_term_id:
-                dias = factura.invoice_payment_term_id.line_ids[0].days
-                fecha_vencimiento = factura.invoice_date + datetime.timedelta(days=dias)
+            # invoice_date => date_invoice
+            if factura.date_due:
+                fecha_vencimiento = datetime.datetime.strptime(str(factura.date_due), '%Y-%m-%d').date().strftime('%Y-%m-%d')
+            if factura.payment_term_id:
+                dias = factura.payment_term_id.line_ids[0].days
+                fecha_vencimiento = factura.date_invoice + datetime.timedelta(days=dias)
                 fecha_vencimiento = datetime.datetime.strptime(str(fecha_vencimiento), '%Y-%m-%d').date().strftime('%Y-%m-%d')
             TagFechaVencimiento.text = fecha_vencimiento
             TagMontoAbono = etree.SubElement(TagAbono,DTE_NS_CFC+"MontoAbono",{})
@@ -396,7 +404,8 @@ class AccountMove(models.Model):
 
 
         if tipo == 'NCRE':
-            factura_original_id = self.env['account.move'].search([('id','=',self._context.get('active_id'))])
+            # account.move => account.invoice
+            factura_original_id = self.env['account.invoice'].search([('id','=',self._context.get('active_id'))])
             if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                 TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
                 cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
@@ -404,7 +413,8 @@ class AccountMove(models.Model):
                 datos_complemento = {'IDComplemento': 'Notas', 'NombreComplemento':'Notas','URIComplemento':'text'}
                 TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
                 datos_referencias = {
-                    'FechaEmisionDocumentoOrigen': str(factura_original_id[0].invoice_date),
+                    # invoice_date => date_invoice
+                    'FechaEmisionDocumentoOrigen': str(factura_original_id[0].date_invoice),
                     # 'MotivoAjuste': 'Nota de credito factura',
                     'NumeroAutorizacionDocumentoOrigen': str(factura_original_id.numero_autorizacion_fel),
                     'NumeroDocumentoOrigen': str(factura_original_id.numero_documento_fel),
@@ -413,10 +423,10 @@ class AccountMove(models.Model):
                 }
                 TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
 
-        if factura.narration:
+        if factura.comment:
             TagAdenda = etree.SubElement(TagDTE, DTE_NS+"Adenda",{})
             TagDECER = etree.SubElement(TagAdenda,"DECertificador",{})
-            TagDECER.text = str(factura.narration)
+            TagDECER.text = str(factura.comment)
 
         xmls = etree.tostring(GTDocumento, encoding="UTF-8")
         # logging.warning(xmls)
@@ -427,9 +437,10 @@ class AccountMove(models.Model):
 
         return {'xmls': xmls.decode("utf-8"), 'fecha_hora_emision': fecha_hora_emision}
 
-    def _post(self,soft=True):
+    def invoice_validate(self):
         for factura in self:
-            if factura.journal_id and factura.move_type in ['out_invoice','out_refund'] and factura.journal_id.tipo_dte_fel and factura.journal_id.codigo_establecimiento_fel:
+            # move_type => type
+            if factura.journal_id and factura.type in ['out_invoice','out_refund'] and factura.journal_id.tipo_dte_fel and factura.journal_id.codigo_establecimiento_fel:
                 xmls_factura = self.xml_factura(factura)
                 attr_qname = etree.QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation")
                 ip = get('https://api.ipify.org').text
@@ -538,12 +549,13 @@ class AccountMove(models.Model):
                         raise UserError(str(json_loads["Envelope"]))
                 else:
                     raise UserError(str(json_loads))
-        return super(AccountMove, self)._post(soft)
+        return super(AccountMove, self).invoice_validate()
 
     def xml_factura_anulacion(self, factura):
         xmls = False
-        if factura.invoice_date != True:
-            factura.invoice_date = fields.Date.context_today(self)
+        # invoice_date => date_invoice
+        if factura.date_invoice != True:
+            factura.date_invoice = fields.Date.context_today(self)
 
         attr_qname = etree.QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation")
         DTE_NS = "{http://www.sat.gob.gt/dte/fel/0.1.0}"
@@ -561,7 +573,8 @@ class AccountMove(models.Model):
         # dato_anulacion = {'ID': 'DatosCertificados'}
         dato_anulacion = {"ID": "DatosCertificados"}
         TagAnulacionDTE = etree.SubElement(TagSAT,DTE_NS+"AnulacionDTE",dato_anulacion)
-        fecha_factura = self.fecha_hora_factura(factura.invoice_date)
+        # invoice_date => date_invoice
+        fecha_factura = self.fecha_hora_factura(factura.date_invoice)
         fecha_anulacion = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%Y-%m-%d")
         hora_anulacion = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
         fecha_anulacion = str(fecha_anulacion)+'T'+str(hora_anulacion)
@@ -596,7 +609,8 @@ class AccountMove(models.Model):
         xmls = xmls.decode("utf-8").replace("&amp;", "&").encode("utf-8")
         return xmls
 
-    def button_draft(self):
+    #Renombrando la funcion de button_draft a action_cancel
+    def action_cancel(self):
         for factura in self:
             if factura.journal_id.tipo_dte_fel and factura.journal_id.codigo_establecimiento_fel and factura.representacion_grafica_fel and factura.numero_autorizacion_fel and factura.numero_documento_fel and factura.serie_documento_fel:
                 xmls = self.xml_factura_anulacion(factura)
@@ -691,4 +705,5 @@ class AccountMove(models.Model):
                                 raise UserError(json_loads)
                         else:
                             raise UserError(json_loads)
-        return super(AccountMove, self).button_draft()
+        #mandando a llamar a la funcion renombrada
+        return super(AccountMove, self).action_cancel()

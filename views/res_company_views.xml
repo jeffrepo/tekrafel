@@ -6,33 +6,38 @@
             <field name="model">res.company</field>
 	        <field name="inherit_id" ref="base.view_company_form"/>
 	        <field name="arch" type="xml">
-                    <page name="general_info" position="after">
-                        <page string="FEEL">
-                            <group string="Frases">
-                                <group>
-                                    <field name="usuario_fel"/>
-                                    <field name="pass_fel"/>
-                                    <!-- <field name="nit_digifactfel"/> -->
-                                    <field name="prueba_fel"/>
-                                    <field name="cliente_fel"/>
-                                    <field name="contrato_fel"/>
-                                    <field name="origen_fel"/>
-                                    <!-- <field name="feel_codigo_exportador"/>
-                                    <field name="feel_logo"/>
-                                    <field name="feel_texto_logo"/> -->
-                                    <field name="fel_frase_ids">
-                                        <tree string="Frases" editable="bottom">
-                                            <field name="codigo"/>
-                                            <field name="frase"/>
-                                        </tree>
-                                    </field>
-                                </group>
-                            </group>
+            <notebook position="inside">
+                <page string="FEEL">
+                    <group string="Frases">
+                        <group>
+                            <field name="usuario_fel"/>
+                            <field name="pass_fel"/>
 
-                        </page>
-                    </page>
+                            <field name="prueba_fel"/>
+                            <field name="cliente_fel"/>
+                            <field name="contrato_fel"/>
+                            <field name="origen_fel"/>
+
+                            <field name="fel_frase_ids">
+                                <tree string="Frases" editable="bottom">
+                                    <field name="codigo"/>
+                                    <field name="frase"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+
+                </page>
+            </notebook>
 	        </field>
 	    </record>
 
   </data>
 </odoo>
+
+<!-- <field name="nit_digifactfel"/> -->
+
+
+<!-- <field name="feel_codigo_exportador"/>
+<field name="feel_logo"/>
+<field name="feel_texto_logo"/> -->

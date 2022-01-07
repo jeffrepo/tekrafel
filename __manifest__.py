@@ -15,7 +15,7 @@
         'views/account_view.xml',
         'views/res_company_views.xml',
         'security/ir.model.access.csv',
-        'views/account_move_view.xml',
+        'views/account_invoice_view.xml',
         # 'views/res_partner_view.xml',
         # 'views/report_invoice.xml',
         # 'views/reporte_ticket.xml',

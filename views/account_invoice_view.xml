@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="tekrafel_view_move_form" model="ir.ui.view">
+            <field name="name">digifactfel.account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+
+                  <field name="numero_autorizacion_fel"/>
+                  <field name="numero_documento_fel"/>
+                  <field name="serie_documento_fel"/>
+                  <field name="codigo_qr" invisible="True"/>
+                  <field name="representacion_grafica_fel"/>
+                  <field name="representacion_grafica_anulada_fel" attrs="{'invisible': [('state', '=', 'posted')]}" />
+                  <field name="codigo_qr"/>
+                  <field name="moitivo_anulacion" attrs="{'invisible': [('state', '=', 'posted')]}" />
+                  <field name="incoterm_fel"/>
+
+                </field>
+
+            </field>
+        </record>
+
+        <record id="tekrafel_invoice_tree" model="ir.ui.view">
+            <field name="name">digifactfel.account.invoice.tree</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+
+                <field name="number" position="after">
+
+                  <field name="numero_documento_fel"/>
+                  <field name="serie_documento_fel"/>
+                  <field name="numero_autorizacion_fel"/>
+                </field>
+
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

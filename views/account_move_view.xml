@@ -17,6 +17,7 @@
                     <field name="codigo_qr"/>
                     <field name="moitivo_anulacion" attrs="{'invisible': [('state', '=', 'posted')]}" />
                     <field name="incoterm_fel"/>
+                    <field name="fecha_vencimiento_fel"/>
                 </group>
             </field>
         </record>

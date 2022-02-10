@@ -31,6 +31,7 @@ class AccountMove(models.Model):
     representacion_grafica_fel = fields.Binary('Factura',copy=False)
     representacion_grafica_anulada_fel = fields.Binary('Factura anulada',copy=False)
     fecha_fel = fields.Char('Fecha fel',copy=False)
+    fecha_vencimiento_fel = fields.Char('Fecha vencimiento fel',copy=False)
     # feel_numero_autorizacion = fields.Char('Feel Numero de autorizacion')
     # feel_serie = fields.Char('Feel serie')
     # feel_numero = fields.Char('Feel numero')
@@ -232,7 +233,7 @@ class AccountMove(models.Model):
 
         for linea in factura.invoice_line_ids:
             tax_ids = linea.tax_ids
-            numero_linea = linea.id
+            numero_linea = 1
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
             linea_datos = {
                 "BienOServicio": bien_servicio,
@@ -510,6 +511,7 @@ class AccountMove(models.Model):
                                     resultado_certificacion_string = json.loads(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"])
                                     if resultado_certificacion_string["error"] == 0:
                                         if ("RepresentacionGrafica" and "CodigoQR" and "NumeroAutorizacion" and "NumeroDocumento" and "SerieDocumento") in resultado_cdr:
+                                            logging.warning(resultado_cdr)
                                             representacion_grafica_fel = resultado_cdr["RepresentacionGrafica"]
                                             codigo_qr = resultado_cdr["CodigoQR"]
                                             numero_autorizacion_fel = resultado_cdr["NumeroAutorizacion"]
@@ -521,6 +523,7 @@ class AccountMove(models.Model):
                                             factura.serie_documento_fel = serie_documento_fel
                                             factura.codigo_qr = codigo_qr
                                             factura.fecha_fel = xmls_factura['fecha_hora_emision']
+                                            # factura.fecha_vencimiento_fel
                                     else:
                                         # logging.warning('1')
                                         raise UserError(str( resultado_certificacion_string ))

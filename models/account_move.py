@@ -231,9 +231,9 @@ class AccountMove(models.Model):
         impuestos_dic = {'IVA': 0}
         tax_iva = False
 
+        numero_linea = 1
         for linea in factura.invoice_line_ids:
             tax_ids = linea.tax_ids
-            numero_linea = 1
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
             linea_datos = {
                 "BienOServicio": bien_servicio,

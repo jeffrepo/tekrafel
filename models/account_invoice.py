@@ -294,7 +294,7 @@ class AccountMove(models.Model):
                     TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
                     TagMontoGravable.text = str(precio_subtotal)
                     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
-                    TagMontoImpuesto.text = '{:.3f}'.format(valor_impuesto)
+                    TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
 
                     lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
 
@@ -324,17 +324,17 @@ class AccountMove(models.Model):
             total_impuesto = 0
             for i in lista_impuestos:
                 total_impuesto += float(i['monto'])
-            dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.3f}'.format(total_impuesto))}
+            dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.6f}'.format(total_impuesto))}
             TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
             TagTotalImpuestos.append(TagTotalImpuesto)
         # else:
         #     logging.warn('ENTRA AL ELSE')
-        #     dato_impuesto = {'NombreCorto': 'IVA','TotalMontoImpuesto': str('{:.3f}'.format(0.00))}
+        #     dato_impuesto = {'NombreCorto': 'IVA','TotalMontoImpuesto': str('{:.6f}'.format(0.00))}
         #     TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
         #     TagTotalImpuestos.append(TagTotalImpuesto)
         TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
         # TagGranTotal.text = str(factura.amount_total)
-        TagGranTotal.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
+        TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
         if tipo == 'FCAM':
             NSMAPFRASECFC = {
@@ -359,7 +359,7 @@ class AccountMove(models.Model):
                 fecha_vencimiento = datetime.datetime.strptime(str(fecha_vencimiento), '%Y-%m-%d').date().strftime('%Y-%m-%d')
             TagFechaVencimiento.text = fecha_vencimiento
             TagMontoAbono = etree.SubElement(TagAbono,DTE_NS_CFC+"MontoAbono",{})
-            TagMontoAbono.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
+            TagMontoAbono.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
 
         if tipo == 'FACT' and (factura.currency_id !=  self.env.user.company_id.currency_id and factura.tipo_factura == 'exportacion'):

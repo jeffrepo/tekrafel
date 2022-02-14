@@ -324,12 +324,12 @@ class AccountMove(models.Model):
             total_impuesto = 0
             for i in lista_impuestos:
                 total_impuesto += float(i['monto'])
-            dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.2f}'.format(total_impuesto))}
+            dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.3f}'.format(total_impuesto))}
             TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
             TagTotalImpuestos.append(TagTotalImpuesto)
         # else:
         #     logging.warn('ENTRA AL ELSE')
-        #     dato_impuesto = {'NombreCorto': 'IVA','TotalMontoImpuesto': str('{:.2f}'.format(0.00))}
+        #     dato_impuesto = {'NombreCorto': 'IVA','TotalMontoImpuesto': str('{:.3f}'.format(0.00))}
         #     TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
         #     TagTotalImpuestos.append(TagTotalImpuesto)
         TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})

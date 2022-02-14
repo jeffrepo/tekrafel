@@ -314,7 +314,9 @@ class AccountMove(models.Model):
                 TagMontoImpuesto.text = "0.00"
 
             TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
-            TagTotal.text = str(linea.price_total)
+            # TagTotal.text = str(linea.price_total)
+            TagTotal.text = '{:.6f}'.format(linea.price_total)
+
 
 
         TagTotales = etree.SubElement(TagDatosEmision,DTE_NS+"Totales",{})

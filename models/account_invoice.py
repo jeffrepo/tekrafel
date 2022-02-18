@@ -208,7 +208,7 @@ class AccountMove(models.Model):
             "dte": "http://www.sat.gob.gt/dte/fel/0.2.0"
         }
 
-        if tipo not in  ['NDEB', 'NCRE']:
+        if tipo not in  ['NDEB', 'NCRE','FESP']:
             TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
             for linea_frase in factura.company_id.fel_frase_ids:
                 frases_datos = {}
@@ -234,9 +234,12 @@ class AccountMove(models.Model):
 
         impuestos_dic = {'IVA': 0}
         tax_iva = False
-
+        total_factura_esp= 0
+        total_impuesto = 0
+        impuesto_isr = 0
         for linea in factura.invoice_line_ids:
             # tax_ids => invoice_line_tax_ids
+            total_linea_fesp = 0
             tax_ids = linea.invoice_line_tax_ids
             numero_linea = linea.id
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
@@ -276,27 +279,41 @@ class AccountMove(models.Model):
             taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.invoice_id.partner_id)
 
             # tax_ids =>invoice_line_tax_ids
+
+            total_factura_esp += (linea.quantity * linea.price_unit)
+            total_linea_fesp = (linea.quantity * linea.price_unit)
             if len(linea.invoice_line_tax_ids) > 0:
                 # impuestos
                 TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
                 for impuesto in taxes['taxes']:
-                    nombre_impuesto = impuesto['name']
-                    valor_impuesto = impuesto['amount']
+                    logging.warning('IMPUESTO TAX')
+                    logging.warning(impuesto)
                     if impuesto['name'] == 'IVA por Pagar':
+                        nombre_impuesto = impuesto['name']
                         nombre_impuesto = "IVA"
+                        valor_impuesto = impuesto['amount']
                         tax_iva = True
 
-                    TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
-                    TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
-                    TagNombreCorto.text = nombre_impuesto
-                    TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
-                    TagCodigoUnidadGravable.text = "1"
-                    TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                    TagMontoGravable.text = str(precio_subtotal)
-                    TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
-                    TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
-
+                        TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                        TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                        TagNombreCorto.text = nombre_impuesto
+                        TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                        TagCodigoUnidadGravable.text = "1"
+                        TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                        TagMontoGravable.text = str(precio_subtotal)
+                        TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                        if tipo == 'FESP':
+                            impuesto_fesp = (linea.quantity*linea.price_unit) - linea.price_subtotal
+                            TagMontoImpuesto.text = '{:.6f}'.format(impuesto_fesp)
+                            total_impuesto += impuesto_fesp
+                        else:
+                            TagMontoImpuesto.text = '{:.6f}'.format(linea.price_total-precio_subtotal)
+                            total_impuesto += linea.price_total-precio_subtotal
                     lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
+
+
+                    if impuesto['name'] == 'ISR Factura Especial':
+                        impuesto_isr += (impuesto['amount'] * -1)
 
             # comentado por el momento
             else:
@@ -315,17 +332,21 @@ class AccountMove(models.Model):
 
             TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
             # TagTotal.text = str(linea.price_total)
-            TagTotal.text = '{:.6f}'.format(linea.price_total)
+            if tipo == 'FESP':
+                TagTotal.text = '{:.6f}'.format(total_linea_fesp)
+            else:
+                TagTotal.text = '{:.6f}'.format(linea.price_total)
 
 
 
         TagTotales = etree.SubElement(TagDatosEmision,DTE_NS+"Totales",{})
         TagTotalImpuestos = etree.SubElement(TagTotales,DTE_NS+"TotalImpuestos",{})
 
+        # total_impuesto = 0
         if len(lista_impuestos) > 0:
-            total_impuesto = 0
-            for i in lista_impuestos:
-                total_impuesto += float(i['monto'])
+            # total_impuesto = 0
+            # for i in lista_impuestos:
+            #     total_impuesto += float(i['monto'])
             dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.6f}'.format(total_impuesto))}
             TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
             TagTotalImpuestos.append(TagTotalImpuesto)
@@ -336,7 +357,10 @@ class AccountMove(models.Model):
         #     TagTotalImpuestos.append(TagTotalImpuesto)
         TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
         # TagGranTotal.text = str(factura.amount_total)
-        TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
+        if tipo == 'FESP':
+            TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(total_factura_esp))
+        else:
+            TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
         if tipo == 'FCAM':
             NSMAPFRASECFC = {
@@ -362,6 +386,22 @@ class AccountMove(models.Model):
             TagFechaVencimiento.text = fecha_vencimiento
             TagMontoAbono = etree.SubElement(TagAbono,DTE_NS_CFC+"MontoAbono",{})
             TagMontoAbono.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
+
+        if tipo == 'FESP':
+            NSMAPFRASECFC = {
+                "cfc": "http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0"
+            }
+            DTE_NS_CFC = "{http://www.sat.gob.gt/face2/ComplementoFacturaEspecial/0.1.0}"
+            DTE_CFC = "{http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0}"
+            TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+            TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",{'NombreComplemento': "RetencionesFacturaEspecial",'URIComplemento': ""})
+            TagRetencionFacturaEspecial = etree.SubElement(TagComplemento,DTE_NS_CFC+"RetencionesFacturaEspecial", {"Version": "1"},nsmap=NSMAPFRASECFC )
+            TagRetencionISR = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionISR",{})
+            TagRetencionISR.text = str('{:.6f}'.format(impuesto_isr))
+            TagRetencionIVA = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionIVA",{})
+            TagRetencionIVA.text = str('{:.6f}'.format(total_impuesto))
+            TagTotalMenosRetenciones = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"TotalMenosRetenciones",{})
+            TagTotalMenosRetenciones.text = str('{:.6f}'.format(total_factura_esp-total_impuesto-impuesto_isr))
 
 
         if tipo == 'FACT' and (factura.currency_id !=  self.env.user.company_id.currency_id and factura.tipo_factura == 'exportacion'):

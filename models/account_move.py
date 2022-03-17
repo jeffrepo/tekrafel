@@ -531,7 +531,7 @@ class AccountMove(models.Model):
                                             factura.codigo_qr = codigo_qr
                                             factura.fecha_fel = xmls_factura['fecha_hora_emision']
 
-                                            return super(AccountMove, self)._post(soft)
+                                            return super(AccountMove, self).post()
 
                                             # factura.fecha_vencimiento_fel
                                     else:

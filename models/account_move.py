@@ -292,7 +292,7 @@ class AccountMove(models.Model):
                     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                     TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
 
-                    lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
+                    lista_impuestos.append({'nombre': nombre_impuesto, 'monto':   '{:.6f}'.format(valor_impuesto)})
 
             # comentado por el momento
             else:
@@ -321,7 +321,7 @@ class AccountMove(models.Model):
             total_impuesto = 0
             for i in lista_impuestos:
                 total_impuesto += float(i['monto'])
-            dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.2f}'.format(total_impuesto))}
+            dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.6f}'.format(total_impuesto))}
             TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
             TagTotalImpuestos.append(TagTotalImpuesto)
         # else:

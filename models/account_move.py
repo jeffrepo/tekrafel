@@ -251,6 +251,16 @@ class AccountMove(models.Model):
             if factura.journal_id.producto_descripcion:
                 descripcion = str(linea.product_id.name) + ' ' +str(linea.name)
             # precio_unitario = (linea.price_unit * (1 - (linea.discount) / 100.0)) if linea.discount > 0 else linea.price_unit
+            precio_unitario = linea.price_unit * (100-linea.discount) / 100
+            precio_sin_descuento = linea.price_unit
+            descuento = precio_sin_descuento * linea.quantity - precio_unitario * linea.quantity
+            precio_unitario_base = linea.price_subtotal / linea.quantity
+            total_linea = precio_unitario * linea.quantity
+            total_linea_base = precio_unitario_base * linea.quantity
+            total_impuestos = total_linea - total_linea_base
+
+
+
             precio_unitario = linea.price_unit
             precio = linea.price_unit * linea.quantity
             total_linea = linea.price_unit * linea.quantity
@@ -288,7 +298,7 @@ class AccountMove(models.Model):
                     TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
                     TagCodigoUnidadGravable.text = "1"
                     TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                    TagMontoGravable.text = str(precio_subtotal)
+                    TagMontoGravable.text = '{:.6f}'.format(total_linea_base)
                     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                     TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
 

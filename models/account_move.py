@@ -532,7 +532,15 @@ class AccountMove(models.Model):
                                             factura.fecha_fel = xmls_factura['fecha_hora_emision']
 
                                             if factura.representacion_grafica_fel and factura.numero_autorizacion_fel and factura.codigo_qr and factura.numero_documento_fel and factura.serie_documento_fel and factura.fecha_fel:
-                                                return super(AccountMove, self)._post(soft)
+                                                logging.warning('si hay info')
+
+                                                try:
+                                                    return super(AccountMove, self)._post(soft)
+                                                except:
+                                                    factura.numero_autorizacion_fel = numero_autorizacion_fel
+                                                    raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
+
+
                                             else:
                                                 raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
                                             # factura.fecha_vencimiento_fel

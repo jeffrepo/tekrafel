@@ -535,8 +535,10 @@ class AccountMove(models.Model):
                                                 logging.warning('si hay info')
 
                                                 try:
+                                                    logging.warning('TRY')
                                                     return super(AccountMove, self)._post(soft)
                                                 except:
+                                                    logging.warning('ext')
                                                     factura.numero_autorizacion_fel = numero_autorizacion_fel
                                                     raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
 

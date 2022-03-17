@@ -523,6 +523,9 @@ class AccountMove(models.Model):
                                             factura.serie_documento_fel = serie_documento_fel
                                             factura.codigo_qr = codigo_qr
                                             factura.fecha_fel = xmls_factura['fecha_hora_emision']
+
+                                            return super(AccountMove, self)._post(soft)
+
                                             # factura.fecha_vencimiento_fel
                                     else:
                                         # logging.warning('1')
@@ -541,7 +544,6 @@ class AccountMove(models.Model):
                         raise UserError(str(json_loads["Envelope"]))
                 else:
                     raise UserError(str(json_loads))
-        return super(AccountMove, self)._post(soft)
 
     def xml_factura_anulacion(self, factura):
         xmls = False

@@ -232,6 +232,7 @@ class AccountMove(models.Model):
         tax_iva = False
 
         numero_linea = 1
+        gran_total = 0
         for linea in factura.invoice_line_ids:
             tax_ids = linea.tax_ids
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
@@ -252,6 +253,7 @@ class AccountMove(models.Model):
             # precio_unitario = (linea.price_unit * (1 - (linea.discount) / 100.0)) if linea.discount > 0 else linea.price_unit
             precio_unitario = linea.price_unit
             precio = linea.price_unit * linea.quantity
+            total_linea = linea.price_unit * linea.quantity
             descuento = ((linea.quantity * linea.price_unit) - linea.price_total) if linea.discount > 0 else 0
             precio_subtotal = linea.price_subtotal
             TagCantidad = etree.SubElement(TagItem,DTE_NS+"Cantidad",{})
@@ -308,7 +310,8 @@ class AccountMove(models.Model):
                 TagMontoImpuesto.text = "0.00"
 
             TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
-            TagTotal.text = str(linea.price_total)
+            gran_total += total_linea
+            TagTotal.text = '{:.6f}'.format(total_linea)
 
 
         TagTotales = etree.SubElement(TagDatosEmision,DTE_NS+"Totales",{})
@@ -328,7 +331,10 @@ class AccountMove(models.Model):
         #     TagTotalImpuestos.append(TagTotalImpuesto)
         TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
         # TagGranTotal.text = str(factura.amount_total)
-        TagGranTotal.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
+        # TagGranTotal.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
+        # '{:.6f}'.format(total_linea)
+        TagGranTotal.text = '{:.6f}'.format(gran_total)
+
 
         if tipo == 'FCAM':
             NSMAPFRASECFC = {

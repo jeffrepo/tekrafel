@@ -184,7 +184,7 @@ class AccountMove(models.Model):
         TagReceptorDireccion.text = (factura.partner_id.street or "Ciudad")+" "+(factura.partner_id.street2 or "")
         TagReceptorCodigoPostal = etree.SubElement(TagDireccionReceptor,DTE_NS+"CodigoPostal",{})
         TagReceptorCodigoPostal.text = factura.partner_id.zip or '01001'
-        municipio_partner = str(factura.partner_id.city)
+        municipio_partner = str(factura.partner_id.city) or 'Guatemala'
         if modulo_bio or modulo_bio.state == 'installed':
             municipio_partner = factura.partner_id.municipio_id.name
         TagReceptorMunicipio = etree.SubElement(TagDireccionReceptor,DTE_NS+"Municipio",{})
@@ -534,13 +534,15 @@ class AccountMove(models.Model):
                                             if factura.representacion_grafica_fel and factura.numero_autorizacion_fel and factura.codigo_qr and factura.numero_documento_fel and factura.serie_documento_fel and factura.fecha_fel:
                                                 logging.warning('si hay info')
 
-                                                try:
-                                                    logging.warning('TRY')
-                                                    return super(AccountMove, self)._post(soft)
-                                                except:
-                                                    logging.warning('ext')
-                                                    factura.numero_autorizacion_fel = numero_autorizacion_fel
-                                                    raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
+                                                return super(AccountMove, self)._post(soft)
+
+                                                # try:
+                                                #     logging.warning('TRY')
+                                                #     return super(AccountMove, self)._post(soft)
+                                                # except:
+                                                #     logging.warning('ext')
+                                                #     factura.numero_autorizacion_fel = numero_autorizacion_fel
+                                                #     raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
 
 
                                             else:

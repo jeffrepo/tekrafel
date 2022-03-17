@@ -232,7 +232,6 @@ class AccountMove(models.Model):
         tax_iva = False
 
         numero_linea = 1
-        gran_total = 0
         for linea in factura.invoice_line_ids:
             tax_ids = linea.tax_ids
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
@@ -251,19 +250,8 @@ class AccountMove(models.Model):
             if factura.journal_id.producto_descripcion:
                 descripcion = str(linea.product_id.name) + ' ' +str(linea.name)
             # precio_unitario = (linea.price_unit * (1 - (linea.discount) / 100.0)) if linea.discount > 0 else linea.price_unit
-            precio_unitario = linea.price_unit * (100-linea.discount) / 100
-            precio_sin_descuento = linea.price_unit
-            descuento = precio_sin_descuento * linea.quantity - precio_unitario * linea.quantity
-            precio_unitario_base = linea.price_subtotal / linea.quantity
-            total_linea = precio_unitario * linea.quantity
-            total_linea_base = precio_unitario_base * linea.quantity
-            total_impuestos = total_linea - total_linea_base
-
-
-
             precio_unitario = linea.price_unit
             precio = linea.price_unit * linea.quantity
-            total_linea = linea.price_unit * linea.quantity
             descuento = ((linea.quantity * linea.price_unit) - linea.price_total) if linea.discount > 0 else 0
             precio_subtotal = linea.price_subtotal
             TagCantidad = etree.SubElement(TagItem,DTE_NS+"Cantidad",{})
@@ -273,11 +261,11 @@ class AccountMove(models.Model):
             TagDescripcion = etree.SubElement(TagItem,DTE_NS+"Descripcion",{})
             TagDescripcion.text = (str(linea.product_id.default_code) +'|'+ str(descripcion)) if linea.product_id.default_code else descripcion
             TagPrecioUnitario = etree.SubElement(TagItem,DTE_NS+"PrecioUnitario",{})
-            TagPrecioUnitario.text = '{:.6f}'.format(round(precio_unitario,4))
+            TagPrecioUnitario.text = '{:.6f}'.format(precio_unitario)
             TagPrecio = etree.SubElement(TagItem,DTE_NS+"Precio",{})
-            TagPrecio.text =  '{:.6f}'.format(round(precio,4))
+            TagPrecio.text =  '{:.6f}'.format(precio)
             TagDescuento = etree.SubElement(TagItem,DTE_NS+"Descuento",{})
-            TagDescuento.text =  str('{:.6f}'.format(descuento,4))
+            TagDescuento.text =  str('{:.6f}'.format(descuento))
 
             currency = linea.move_id.currency_id
             taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
@@ -298,11 +286,11 @@ class AccountMove(models.Model):
                     TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
                     TagCodigoUnidadGravable.text = "1"
                     TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                    TagMontoGravable.text = '{:.6f}'.format(round(total_linea_base,4))
+                    TagMontoGravable.text = '{:.6f}'.format(precio_subtotal)
                     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
-                    TagMontoImpuesto.text = '{:.6f}'.format(round(valor_impuesto,4))
+                    TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
 
-                    lista_impuestos.append({'nombre': nombre_impuesto, 'monto':   '{:.6f}'.format(valor_impuesto)})
+                    lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
 
             # comentado por el momento
             else:
@@ -320,8 +308,7 @@ class AccountMove(models.Model):
                 TagMontoImpuesto.text = "0.00"
 
             TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
-            gran_total += total_linea
-            TagTotal.text = '{:.6f}'.format(total_linea)
+            TagTotal.text = str(linea.price_total)
 
 
         TagTotales = etree.SubElement(TagDatosEmision,DTE_NS+"Totales",{})
@@ -341,10 +328,7 @@ class AccountMove(models.Model):
         #     TagTotalImpuestos.append(TagTotalImpuesto)
         TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
         # TagGranTotal.text = str(factura.amount_total)
-        # TagGranTotal.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
-        # '{:.6f}'.format(total_linea)
-        TagGranTotal.text = '{:.6f}'.format(gran_total)
-
+        TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
         if tipo == 'FCAM':
             NSMAPFRASECFC = {

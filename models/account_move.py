@@ -273,9 +273,9 @@ class AccountMove(models.Model):
             TagDescripcion = etree.SubElement(TagItem,DTE_NS+"Descripcion",{})
             TagDescripcion.text = (str(linea.product_id.default_code) +'|'+ str(descripcion)) if linea.product_id.default_code else descripcion
             TagPrecioUnitario = etree.SubElement(TagItem,DTE_NS+"PrecioUnitario",{})
-            TagPrecioUnitario.text = '{:.6f}'.format(precio_unitario)
+            TagPrecioUnitario.text = '{:.6f}'.format(round(precio_unitario))
             TagPrecio = etree.SubElement(TagItem,DTE_NS+"Precio",{})
-            TagPrecio.text =  '{:.6f}'.format(precio)
+            TagPrecio.text =  '{:.6f}'.format(round(precio))
             TagDescuento = etree.SubElement(TagItem,DTE_NS+"Descuento",{})
             TagDescuento.text =  str('{:.6f}'.format(descuento))
 
@@ -298,9 +298,9 @@ class AccountMove(models.Model):
                     TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
                     TagCodigoUnidadGravable.text = "1"
                     TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                    TagMontoGravable.text = '{:.6f}'.format(total_linea_base)
+                    TagMontoGravable.text = '{:.6f}'.format(round(total_linea_base))
                     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
-                    TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
+                    TagMontoImpuesto.text = '{:.6f}'.format(round(valor_impuesto))
 
                     lista_impuestos.append({'nombre': nombre_impuesto, 'monto':   '{:.6f}'.format(valor_impuesto)})
 

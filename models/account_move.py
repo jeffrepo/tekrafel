@@ -119,7 +119,7 @@ class AccountMove(models.Model):
         datos_emisor = {
             "AfiliacionIVA":"GEN",
             "CodigoEstablecimiento": str(factura.journal_id.codigo_establecimiento_fel),
-            "CorreoEmisor": str(factura.company_id.email) or "",
+            "CorreoEmisor": str(factura.company_id.email),
             "NITEmisor": str(nit_company),
             # "NITEmisor": '103480307',
             "NombreComercial": factura.journal_id.nombre_comercial_fel,
@@ -134,7 +134,7 @@ class AccountMove(models.Model):
                 nit_partner = factura.partner_id.vat
 
         datos_receptor = {
-            "CorreoReceptor": factura.partner_id.email or "",
+            "CorreoReceptor": factura.partner_id.email,
             "IDReceptor": str(nit_partner),
             "NombreReceptor": factura.partner_id.name
         }

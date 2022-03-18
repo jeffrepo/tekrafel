@@ -546,8 +546,8 @@ class AccountMove(models.Model):
                                                 #     raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
 
 
-                                            else:
-                                                raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
+                                            # else:
+                                            #     raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
                                             # factura.fecha_vencimiento_fel
                                     else:
                                         # logging.warning('1')

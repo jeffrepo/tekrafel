@@ -178,6 +178,9 @@ class AccountMove(models.Model):
         TagPais = etree.SubElement(TagDireccionEmisor,DTE_NS+"Pais",{})
         TagPais.text = "GT"
         # Datos de receptor
+        logging.warning('LOS TAGS')
+        logging.warning(TagDatosEmision)
+        logging.warning(datos_receptor)
         TagReceptor = etree.SubElement(TagDatosEmision,DTE_NS+"Receptor",datos_receptor)
         TagDireccionReceptor = etree.SubElement(TagReceptor,DTE_NS+"DireccionReceptor",{})
         TagReceptorDireccion = etree.SubElement(TagDireccionReceptor,DTE_NS+"Direccion",{})
@@ -531,10 +534,8 @@ class AccountMove(models.Model):
                                             factura.codigo_qr = codigo_qr
                                             factura.fecha_fel = xmls_factura['fecha_hora_emision']
 
-                                            if factura.representacion_grafica_fel and factura.numero_autorizacion_fel and factura.codigo_qr and factura.numero_documento_fel and factura.serie_documento_fel and factura.fecha_fel:
-                                                logging.warning('si hay info')
-
-                                                return super(AccountMove, self)._post(soft)
+                                            # if factura.representacion_grafica_fel and factura.numero_autorizacion_fel and factura.codigo_qr and factura.numero_documento_fel and factura.serie_documento_fel and factura.fecha_fel:
+                                            #     logging.warning('si hay info')
 
                                                 # try:
                                                 #     logging.warning('TRY')
@@ -565,6 +566,7 @@ class AccountMove(models.Model):
                         raise UserError(str(json_loads["Envelope"]))
                 else:
                     raise UserError(str(json_loads))
+        return super(AccountMove, self)._post(soft)
 
     def xml_factura_anulacion(self, factura):
         xmls = False

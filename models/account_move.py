@@ -433,7 +433,7 @@ class AccountMove(models.Model):
 
     def _post(self,soft=True):
         for factura in self:
-            if factura.journal_id and factura.move_type in ['out_invoice','out_refund'] and factura.journal_id.tipo_dte_fel and factura.journal_id.codigo_establecimiento_fel:
+            if factura.journal_id and factura.state == 'draft' and factura.move_type in ['out_invoice','out_refund'] and factura.journal_id.tipo_dte_fel and factura.journal_id.codigo_establecimiento_fel:
                 xmls_factura = self.xml_factura(factura)
                 attr_qname = etree.QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation")
                 ip = get('https://api.ipify.org').text

@@ -279,6 +279,7 @@ class AccountMove(models.Model):
             taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.invoice_id.partner_id)
 
             logging.warning('LOS TAXES')
+            logging.warning(linea.product_id.name)
             logging.warning(taxes)
             # tax_ids =>invoice_line_tax_ids
 

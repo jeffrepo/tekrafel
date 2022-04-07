@@ -367,6 +367,9 @@ class AccountMove(models.Model):
         if tipo == 'FESP':
             TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(total_factura_esp))
         else:
+            logging.warning('GRAN TOTAL')
+            logging.warning(factura.amount_total)
+            logging.warning('{:.6f}'.format(factura.currency_id.round(factura.amount_total)))
             TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
         if tipo == 'FCAM':

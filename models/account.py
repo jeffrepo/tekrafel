@@ -88,6 +88,7 @@ class AccountTax(models.Model):
         # the 'Account' decimal precision + 5), and that way it's like
         # rounding after the sum of the tax amounts of each line
         prec = currency.decimal_places
+        prec = 5
         logging.warning('PRESICION DECIMAL')
         logging.warning(prec)
 

@@ -310,8 +310,12 @@ class AccountMove(models.Model):
                             TagMontoImpuesto.text = '{:.6f}'.format(impuesto_fesp)
                             total_impuesto += impuesto_fesp
                         else:
-                            TagMontoImpuesto.text = '{:.6f}'.format(linea.price_total-precio_subtotal)
-                            total_impuesto += linea.price_total-precio_subtotal
+                            # viejo calculo impuesto
+                            # TagMontoImpuesto.text = '{:.6f}'.format(linea.price_total-precio_subtotal)
+                            # total_impuesto += linea.price_total-precio_subtotal
+                            TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
+                            total_impuesto += valor_impuesto
+
                     lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
 
 

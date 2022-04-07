@@ -278,6 +278,8 @@ class AccountMove(models.Model):
             currency = linea.invoice_id.currency_id
             taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.invoice_id.partner_id)
 
+            logging.warning('LOS TAXES')
+            logging.warning(taxes)
             # tax_ids =>invoice_line_tax_ids
 
             total_factura_esp += (linea.quantity * linea.price_unit)

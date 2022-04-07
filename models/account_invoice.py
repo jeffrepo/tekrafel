@@ -370,7 +370,7 @@ class AccountMove(models.Model):
             TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(total_factura_esp))
         else:
             logging.warning('GRAN TOTAL')
-            logging.watning(gran_total)
+            logging.warning(gran_total)
             logging.warning(factura.amount_total)
             logging.warning('{:.6f}'.format(factura.currency_id.round(factura.amount_total)))
             TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(gran_total))

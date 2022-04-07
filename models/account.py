@@ -141,7 +141,7 @@ class AccountTax(models.Model):
             # else:
             #     tax_amount = currency.round(tax_amount)
 
-            logging,warning(tax_amount)
+            logging.warning(tax_amount)
             tax_amount = round(tax_amount, prec)
             logging.warning('TAX AMONUT ROUND')
             logging.warning(tax_amount)

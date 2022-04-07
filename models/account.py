@@ -138,6 +138,8 @@ class AccountTax(models.Model):
             tax_amount = tax._compute_amount(base, price_unit, quantity, product, partner)
             if not round_tax:
                 tax_amount = round(tax_amount, prec)
+                logging.warning('TAX AMONUT ROUND')
+                logging.warning(tax_amount)
             else:
                 tax_amount = currency.round(tax_amount)
 

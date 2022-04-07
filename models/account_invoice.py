@@ -237,9 +237,11 @@ class AccountMove(models.Model):
         total_factura_esp= 0
         total_impuesto = 0
         impuesto_isr = 0
+        gran_total = 0
         for linea in factura.invoice_line_ids:
             # tax_ids => invoice_line_tax_ids
             total_linea_fesp = 0
+            gran_total += linea.price_total
             tax_ids = linea.invoice_line_tax_ids
             numero_linea = linea.id
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
@@ -368,9 +370,10 @@ class AccountMove(models.Model):
             TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(total_factura_esp))
         else:
             logging.warning('GRAN TOTAL')
+            logging.watning(gran_total)
             logging.warning(factura.amount_total)
             logging.warning('{:.6f}'.format(factura.currency_id.round(factura.amount_total)))
-            TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
+            TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(gran_total))
 
         if tipo == 'FCAM':
             NSMAPFRASECFC = {

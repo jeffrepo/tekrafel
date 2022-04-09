@@ -297,6 +297,7 @@ class AccountMove(models.Model):
                         nombre_impuesto = impuesto['name']
                         nombre_impuesto = "IVA"
                         valor_impuesto = impuesto['amount']
+                        valor_sin_impuesto = impuesto['base']
                         tax_iva = True
 
                         TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
@@ -305,7 +306,8 @@ class AccountMove(models.Model):
                         TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
                         TagCodigoUnidadGravable.text = "1"
                         TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                        TagMontoGravable.text = str(precio_subtotal)
+                        # TagMontoGravable.text = str(precio_subtotal)
+                        TagMontoGravable.text = '{:.6f}'.format(valor_sin_impuesto)
                         TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                         if tipo == 'FESP':
                             impuesto_fesp = (linea.quantity*linea.price_unit) - linea.price_subtotal

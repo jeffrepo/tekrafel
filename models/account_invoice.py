@@ -238,18 +238,19 @@ class AccountMove(models.Model):
         total_impuesto = 0
         impuesto_isr = 0
         gran_total = 0
+        numero_linea = 1
         for linea in factura.invoice_line_ids:
             # tax_ids => invoice_line_tax_ids
             total_linea_fesp = 0
             gran_total += linea.price_total
             tax_ids = linea.invoice_line_tax_ids
-            numero_linea = linea.id
+
             bien_servicio = "S" if linea.product_id.type == 'service' else "B"
             linea_datos = {
                 "BienOServicio": bien_servicio,
                 'NumeroLinea': str(numero_linea)
             }
-            numero_linea += 1
+            # numero_linea += 1
             TagItem =  etree.SubElement(TagItems,DTE_NS+"Item",linea_datos)
 
             cantidad = linea.quantity
@@ -342,6 +343,7 @@ class AccountMove(models.Model):
                 TagMontoImpuesto.text = "0.00"
 
             TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
+            numero_linea += 1
             # TagTotal.text = str(linea.price_total)
             if tipo == 'FESP':
                 TagTotal.text = '{:.6f}'.format(total_linea_fesp)

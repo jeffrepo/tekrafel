@@ -135,10 +135,58 @@ class AccountMove(models.Model):
 
         datos_receptor = {
             "CorreoReceptor": factura.partner_id.email if factura.partner_id.email else '',
-            "IDReceptor": str(nit_partner),
             "NombreReceptor": factura.partner_id.name
         }
 
+
+        #VERIFICAMOS SI SE FACTURA CON NIT O DPI
+        if factura.partner_id.documento_personal_identificacion == False:
+            datos_receptor['IDReceptor'] = str(nit_partner)
+
+        if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion:
+            datos_receptor['TipoEspecial'] = "CUI"
+
+            headers = { "Content-Type": "application/json" }
+
+            data = {
+                "autenticacion":{
+                    "pn_usuario": factura.company_id.usuario_fel,
+                    "pn_clave": factura.company_id.pass_fel,
+                },
+                "parametros": {
+                    "pn_cui": str(factura.partner_id.documento_personal_identificacion),
+                }
+            }
+
+            r = requests.post('https://apiseguimiento.tekra.com.gt/certificaciones/contribuyente/contribuyente_consulta_cui', json=data, headers=headers)
+            logging.warning(r.text)
+            if r and r.json():
+                respuesta = r.json()
+                if respuesta:
+                    if "resultado" in respuesta:
+                        if len(respuesta["resultado"]) > 0:
+                            if "error" in respuesta["resultado"][0]:
+                                if respuesta["resultado"][0]["error"] == 0:
+                                    nombre_cliente = respuesta["datos"][0]["nombre"]
+                                    datos_receptor['NombreReceptor'] = nombre_cliente
+                                    factura.partner_id.name = nombre_cliente
+                                else:
+                                    raise UserError(str( respuesta ))
+                            else:
+                                raise UserError(str( respuesta ))
+                        else:
+                            raise UserError(str( respuesta ))
+                    else:
+                        raise UserError(str( respuesta ))
+                else:
+                    raise UserError(str( respuesta ))
+
+
+            datos_receptor['IDReceptor'] = str(factura.partner_id.documento_personal_identificacion)
+
+        if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion == False and factura.partner_id.pasaporte:
+            datos_receptor['TipoEspecial'] = "EXT"
+            datos_receptor['IDReceptor'] = str(factura.partner_id.pasaporte)
 
         if tipo == 'FACT' and factura.currency_id !=  self.env.user.company_id.currency_id:
             datos_receptor['IDReceptor'] = "CF"
@@ -172,7 +220,7 @@ class AccountMove(models.Model):
             municipio = factura.partner_id.municipio_id.name
 
         TagMunicipio = etree.SubElement(TagDireccionEmisor,DTE_NS+"Municipio",{})
-        TagMunicipio.text = municipio
+        TagMunicipio.text = "muni"
         TagDepartamento = etree.SubElement(TagDireccionEmisor,DTE_NS+"Departamento",{})
         TagDepartamento.text = str(factura.company_id.state_id.name)
         TagPais = etree.SubElement(TagDireccionEmisor,DTE_NS+"Pais",{})

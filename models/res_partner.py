@@ -14,6 +14,6 @@ from odoo import api, fields, models, _
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    codigo_comprador = fields.Char('Codigo comprador')
-
+    documento_personal_identificacion = fields.Char('DPI')
+    pasaporte = fields.Char('Pasaporte')
     # feel_codigo_establecimiento = fields.Char('Codigo de establecimiento')

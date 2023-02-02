@@ -16,5 +16,6 @@ class ResPartner(models.Model):
 
     documento_personal_identificacion = fields.Char('DPI')
     pasaporte = fields.Char('Pasaporte')
+    codigo_comprador = fields.Char('Codigo comprador')
 
     # feel_codigo_establecimiento = fields.Char('Codigo de establecimiento')

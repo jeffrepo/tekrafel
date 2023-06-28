@@ -534,86 +534,90 @@ class AccountMove(models.Model):
                 headers = { 'Content-Type': 'application/xml','Connection': 'keep-alive' }
                 # POST request
                 logging.warning(xmls2)
-                response2 = requests.post(url, data=xmls2,headers=headers , verify=False)
+                logging.warning("Intento de hacer request Post y enviar la invo")
+                try:
+                    response2 = requests.post(url, data=xmls2,headers=headers , verify=False, timeout=10)
 
-                # prints the response
-                doc1 = response2.text
-                namespaces = {
-                    'http://schemas.xmlsoap.org/soap/envelope/': None,
-                    'http://schemas.xmlsoap.org/soap/envelope/': None,
-                    'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/': None,
-                    'https://apicertificacion.tekra.com.gt/certificacion/wsdl/': None
-                }
-                json_text = xmltodict.parse(response2.text,process_namespaces=True,namespaces=namespaces)
-                json_dic = json.dumps(json_text)
-                json_loads = json.loads(json_dic)
-                logging.warning('json_loads')
-                logging.warning(json_loads)
-                if "Envelope" in json_loads:
-                    logging.warning('8')
-                    if "Body" in json_loads["Envelope"]:
-                        logging.warning('9')
-                        # logging.warning('json_loads["Envelope"]["Body"]')
-                        # logging.warning(json_loads["Envelope"]["Body"])
-                        if "CertificacionDocumentoResponse" in json_loads["Envelope"]["Body"]:
-                            logging.warning('10')
-                            # logging.warning('json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]')
-                            # logging.warning(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"])
-                            if "ResultadoCertificacion" in json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]:
-                                logging.warning('11')
-                                if "error" in json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"]:
-                                    resultado_cdr = json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]
-                                    resultado_certificacion_string = json.loads(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"])
-                                    logging.warning('12')
-                                    if resultado_certificacion_string["error"] == 0:
-                                        logging.warning('3')
-                                        if ("RepresentacionGrafica" and "CodigoQR" and "NumeroAutorizacion" and "NumeroDocumento" and "SerieDocumento") in resultado_cdr:
-                                            logging.warning('14')
-                                            logging.warning(resultado_cdr)
-                                            representacion_grafica_fel = resultado_cdr["RepresentacionGrafica"]
-                                            codigo_qr = resultado_cdr["CodigoQR"]
-                                            numero_autorizacion_fel = resultado_cdr["NumeroAutorizacion"]
-                                            numero_documento_fel = resultado_cdr["NumeroDocumento"]
-                                            serie_documento_fel = resultado_cdr["SerieDocumento"]
-                                            factura.representacion_grafica_fel =representacion_grafica_fel
-                                            factura.numero_autorizacion_fel = numero_autorizacion_fel
-                                            factura.numero_documento_fel = numero_documento_fel
-                                            factura.serie_documento_fel = serie_documento_fel
-                                            factura.codigo_qr = codigo_qr
-                                            factura.fecha_fel = xmls_factura['fecha_hora_emision']
+                    # prints the response
+                    doc1 = response2.text
+                    namespaces = {
+                        'http://schemas.xmlsoap.org/soap/envelope/': None,
+                        'http://schemas.xmlsoap.org/soap/envelope/': None,
+                        'http://apicertificacion.desa.tekra.com.gt:8080/certificacion/wsdl/': None,
+                        'https://apicertificacion.tekra.com.gt/certificacion/wsdl/': None
+                    }
+                    json_text = xmltodict.parse(response2.text,process_namespaces=True,namespaces=namespaces)
+                    json_dic = json.dumps(json_text)
+                    json_loads = json.loads(json_dic)
+                    logging.warning('json_loads')
+                    logging.warning(json_loads)
+                    if "Envelope" in json_loads:
+                        logging.warning('8')
+                        if "Body" in json_loads["Envelope"]:
+                            logging.warning('9')
+                            # logging.warning('json_loads["Envelope"]["Body"]')
+                            # logging.warning(json_loads["Envelope"]["Body"])
+                            if "CertificacionDocumentoResponse" in json_loads["Envelope"]["Body"]:
+                                logging.warning('10')
+                                # logging.warning('json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]')
+                                # logging.warning(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"])
+                                if "ResultadoCertificacion" in json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]:
+                                    logging.warning('11')
+                                    if "error" in json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"]:
+                                        resultado_cdr = json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]
+                                        resultado_certificacion_string = json.loads(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"])
+                                        logging.warning('12')
+                                        if resultado_certificacion_string["error"] == 0:
+                                            logging.warning('3')
+                                            if ("RepresentacionGrafica" and "CodigoQR" and "NumeroAutorizacion" and "NumeroDocumento" and "SerieDocumento") in resultado_cdr:
+                                                logging.warning('14')
+                                                logging.warning(resultado_cdr)
+                                                representacion_grafica_fel = resultado_cdr["RepresentacionGrafica"]
+                                                codigo_qr = resultado_cdr["CodigoQR"]
+                                                numero_autorizacion_fel = resultado_cdr["NumeroAutorizacion"]
+                                                numero_documento_fel = resultado_cdr["NumeroDocumento"]
+                                                serie_documento_fel = resultado_cdr["SerieDocumento"]
+                                                factura.representacion_grafica_fel =representacion_grafica_fel
+                                                factura.numero_autorizacion_fel = numero_autorizacion_fel
+                                                factura.numero_documento_fel = numero_documento_fel
+                                                factura.serie_documento_fel = serie_documento_fel
+                                                factura.codigo_qr = codigo_qr
+                                                factura.fecha_fel = xmls_factura['fecha_hora_emision']
 
-                                            # if factura.representacion_grafica_fel and factura.numero_autorizacion_fel and factura.codigo_qr and factura.numero_documento_fel and factura.serie_documento_fel and factura.fecha_fel:
-                                            #     logging.warning('si hay info')
+                                                # if factura.representacion_grafica_fel and factura.numero_autorizacion_fel and factura.codigo_qr and factura.numero_documento_fel and factura.serie_documento_fel and factura.fecha_fel:
+                                                #     logging.warning('si hay info')
 
-                                                # try:
-                                                #     logging.warning('TRY')
-                                                #     return super(AccountMove, self)._post(soft)
-                                                # except:
-                                                #     logging.warning('ext')
-                                                #     factura.numero_autorizacion_fel = numero_autorizacion_fel
+                                                    # try:
+                                                    #     logging.warning('TRY')
+                                                    #     return super(AccountMove, self)._post(soft)
+                                                    # except:
+                                                    #     logging.warning('ext')
+                                                    #     factura.numero_autorizacion_fel = numero_autorizacion_fel
+                                                    #     raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
+
+
+                                                # else:
                                                 #     raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
-
-
-                                            # else:
-                                            #     raise UserError(str( 'Puede que la factura en otro momemto se validó en otra plataforma' ))
-                                            # factura.fecha_vencimiento_fel
+                                                # factura.fecha_vencimiento_fel
+                                        else:
+                                            # logging.warning('1')
+                                            raise UserError(str( resultado_certificacion_string ))
                                     else:
-                                        # logging.warning('1')
-                                        raise UserError(str( resultado_certificacion_string ))
+                                        # logging.warning('2')
+                                        raise UserError(str( json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"] ))
                                 else:
-                                    # logging.warning('2')
-                                    raise UserError(str( json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"]["ResultadoCertificacion"] ))
+                                    # logging.warning('3')
+                                    raise UserError(str(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"] ))
                             else:
-                                # logging.warning('3')
-                                raise UserError(str(json_loads["Envelope"]["Body"]["CertificacionDocumentoResponse"] ))
+                                # logging.warning('4')
+                                raise UserError(str(json_loads["Envelope"]["Body"]  ))
                         else:
-                            # logging.warning('4')
-                            raise UserError(str(json_loads["Envelope"]["Body"]  ))
+                            # logging.warning('5')
+                            raise UserError(str(json_loads["Envelope"]))
                     else:
-                        # logging.warning('5')
-                        raise UserError(str(json_loads["Envelope"]))
-                else:
-                    raise UserError(str(json_loads))
+                        raise UserError(str(json_loads))
+                except:
+                    raise UserError("10 seconds timeout")
         return super(AccountMove, self)._post(soft)
 
     def xml_factura_anulacion(self, factura):
@@ -651,7 +655,7 @@ class AccountMove(models.Model):
 
         if factura.partner_id.documento_personal_identificacion:
             nit_partner = factura.partner_id.documento_personal_identificacion
-            
+
         nit_company = "CF"
         if '-' in factura.company_id.vat:
             nit_company = factura.company_id.vat.replace('-','')

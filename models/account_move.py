@@ -536,7 +536,7 @@ class AccountMove(models.Model):
                 logging.warning(xmls2)
                 logging.warning("Intento de hacer request Post y enviar la invo")
                 try:
-                    response2 = requests.post(url, data=xmls2,headers=headers , verify=False, timeout=10)
+                    response2 = requests.post(url, data=xmls2,headers=headers , verify=False, timeout=5)
 
                     # prints the response
                     doc1 = response2.text

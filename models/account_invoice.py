@@ -692,7 +692,9 @@ class AccountMove(models.Model):
                 nit_partner = factura.partner_id.vat.replace('-','')
             else:
                 nit_partner = factura.partner_id.vat
-
+        
+        if factura.partner_id.documento_personal_identificacion:
+            nit_partner = factura.partner_id.documento_personal_identificacion
 
         nit_company = "CF"
         if '-' in factura.company_id.vat:

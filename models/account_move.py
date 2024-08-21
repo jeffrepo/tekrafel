@@ -315,7 +315,10 @@ class AccountMove(models.Model):
             precio_unitario = linea.price_unit
             precio = linea.price_unit * linea.quantity
             descuento = ((linea.quantity * linea.price_unit) - linea.price_total) if linea.discount > 0 else 0
+            logging.warning('precio tekra')
+            logging.warning(linea.price_subtotal)
             precio_subtotal = '{:.6f}'.format(linea.price_subtotal)
+            logging.warning(precio_subtotal)
             TagCantidad = etree.SubElement(TagItem,DTE_NS+"Cantidad",{})
             TagCantidad.text = str(cantidad)
             TagUnidadMedida = etree.SubElement(TagItem,DTE_NS+"UnidadMedida",{})

@@ -365,9 +365,9 @@ class AccountMove(models.Model):
                 if factura.amount_tax == 0:
                     TagCodigoUnidadGravable.text = "2"
                 TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                TagMontoGravable.text = str(precio_subtotal)
+                TagMontoGravable.text = '{:.6f}'.format(precio_subtotal)
                 TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
-                TagMontoImpuesto.text = "0.00"
+                TagMontoImpuesto.text = "0.000000"
 
             TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
             TagTotal.text = str(linea.price_total)

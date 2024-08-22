@@ -225,10 +225,10 @@ class AccountMove(models.Model):
         TagDireccion.text = str(factura.journal_id.direccion_sucursal)
         TagCodigoPostal = etree.SubElement(TagDireccionEmisor,DTE_NS+"CodigoPostal",{})
         TagCodigoPostal.text = str(factura.journal_id.codigo_postal)
-        modulo_bio = self.env['ir.module.module'].search([('name', '=', 'biotecnica')])
+        #modulo_bio = self.env['ir.module.module'].search([('name', '=', 'biotecnica')])
         municipio = str(factura.company_id.city)
-        if modulo_bio and modulo_bio.state == 'installed':
-            municipio = factura.partner_id.municipio_id.name
+        #if modulo_bio and modulo_bio.state == 'installed':
+            #municipio = factura.partner_id.municipio_id.name
 
         TagMunicipio = etree.SubElement(TagDireccionEmisor,DTE_NS+"Municipio",{})
         TagMunicipio.text = "muni"
@@ -247,8 +247,8 @@ class AccountMove(models.Model):
         TagReceptorCodigoPostal = etree.SubElement(TagDireccionReceptor,DTE_NS+"CodigoPostal",{})
         TagReceptorCodigoPostal.text = factura.partner_id.zip or '01001'
         municipio_partner = str(factura.partner_id.city) or 'Guatemala'
-        if modulo_bio or modulo_bio.state == 'installed':
-            municipio_partner = factura.partner_id.municipio_id.name
+        #if modulo_bio or modulo_bio.state == 'installed':
+            #municipio_partner = factura.partner_id.municipio_id.name
         TagReceptorMunicipio = etree.SubElement(TagDireccionReceptor,DTE_NS+"Municipio",{})
         TagReceptorMunicipio.text = municipio_partner or 'Guatemala'
         TagReceptorDepartamento = etree.SubElement(TagDireccionReceptor,DTE_NS+"Departamento",{})

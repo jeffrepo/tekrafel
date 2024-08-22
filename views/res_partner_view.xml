@@ -8,7 +8,7 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <field name="vat" position="after">
-                    <field name="documento_personal_identificacion"/>
+                    
                     <field name="pasaporte"/>
                 </field>
             </field>

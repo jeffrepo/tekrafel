@@ -351,7 +351,7 @@ class AccountMove(models.Model):
                     TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
                     TagCodigoUnidadGravable.text = "1"
                     TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                    TagMontoGravable.text = '{:.6f}'.format(precio_subtotal)
+                    TagMontoGravable.text = precio_subtotal
                     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                     TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
 
